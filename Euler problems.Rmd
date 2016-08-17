@@ -94,10 +94,6 @@ cat('The primes below 10,000,000 are ', head(primes), '...', tail(primes), '.\n'
 
 # Get base prime factors
 
-primes_subset <- primes[1:100]
-
-
-
 phi <- function(d) {
   if(d %in% primes){return(d-1)}
   primes_to_check <- primes[1:Find(function(x) {sqrt(d) < x}, primes)]
