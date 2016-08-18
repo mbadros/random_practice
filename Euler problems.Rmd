@@ -95,42 +95,39 @@ cat('The primes below 10,000,000 are ', head(primes), '...', tail(primes), '.\n'
 
 # Get base prime factors
 
-fast_prime_find <- function(x) {
-  Position(function(d) {(x < d | x == d)}, right = TRUE, primes, nomatch = -1)
-}
-
-fast_max_check <- function(x) {
-  Position(function(d) {d > sqrt(x)}, primes)
-}
-
 library(profvis)
-set.seed(123)
+
 profvis({
-  x <- as.integer(runif(10, 2, 100000))
-  sapply(x, fast_prime_find)
+  fast_prime_find <- function(x) {
+    check_limit = Position(function(d) {(d > x)}, primes)
+    is_it_prime = Position(function(d) {(x == d)}, primes[1:check_limit], nomatch = -1)
+    return(is_it_prime)
+  }
+
+  fast_max_check <- function(x) {
+    Position(function(d) {d > sqrt(x)}, primes)
+  }
+
+  phi <- function(d) {
+    if(fast_prime_find(d) > 0) {
+      return(d-1)}
+    else {
+      primes_to_check <- primes[1:fast_max_check(d)]
+      base_factors <- primes_to_check[d %% primes_to_check == 0]
+      return(prod((base_factors - 1)/base_factors) * d)
+    }
+  }
+
+  pe_72 = 1e6
+  
+  temp <- 0
+  for(counter in 2:pe_72) {
+    temp = temp + phi(counter)
+  }
+  temp
 })
 
 
-phi <- function(d) {
-  if(fast_prime_find(d) > 0) {
-    return(d-1)}
-  else {
-    primes_to_check <- primes[1:fast_max_check(d)]
-    base_factors <- primes_to_check[d %% primes_to_check == 0]
-    return(prod((base_factors - 1)/base_factors) * d)
-  }
-}
 
-
-pe_72 = 100
-test = sapply(1:pe_72, phi)
-sum(test)
-
-temp = 0
-for(c in 1:1000) {
-  cat(phi(c), '\n')
-}
-
-
-sum(test)
+sum(temp)
 ```
